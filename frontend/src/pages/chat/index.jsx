@@ -14,7 +14,9 @@ import {
   Paper,
   CircularProgress,
   Chip,
-  styled
+  styled,
+  keyframes,
+  useTheme as useMuiTheme
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { format } from "date-fns";
@@ -27,6 +29,12 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import { BULLSEYE_FRAMEWORK_QUIZ, BULLSEYE_FRAMEWORK_QUIZ_2 } from "./constant";
 import logo from '../../assets/logo.svg';
+
+const pulse = keyframes`
+  0% { opacity: .5; }
+  50% { opacity: 1; }
+  100% { opacity: .5; }
+`;
 
 // Styled components for sidebar
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
@@ -68,11 +76,12 @@ const StyledListItem = styled(ListItem)(({ theme, active }) => ({
 
 const ChatScreen = () => {
   const navigate = useNavigate();
-  const theme = useTheme();
+  const theme = useMuiTheme();
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isBotTyping, setIsBotTyping] = useState(false);
   const [activeItem, setActiveItem] = useState('/chat');
 
   const menuItems = [
@@ -80,6 +89,11 @@ const ChatScreen = () => {
     { text: 'Sessions', icon: <Video size={22} />, path: '/sessions' },
     { text: 'Chats', icon: <MessageSquare size={22} />, path: '/chats' },
     { text: 'Calendar', icon: <Calendar size={22} />, path: '/calendar' }
+  ];
+
+  const promptSuggestions = [
+    "What is bulls eye framework?",
+    "Test my understanding"
   ];
 
   const TypingIndicator = () => (
@@ -125,13 +139,33 @@ const ChatScreen = () => {
 
     const userMessage = {
       text: message,
-      sender: "user",
+      sender: "user", 
       timestamp: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsBotTyping(true);
 
+    // Handle special quiz cases
+    if (message.toLowerCase() === "test my understanding") {
+      setTimeout(() => {
+        const botMessage = BULLSEYE_FRAMEWORK_QUIZ
+        setMessages((prev) => [...prev, botMessage]);
+        setIsBotTyping(false);
+      }, 1500);
+      return;
+    }
+
+    if (message.toLowerCase() === "1-b, 2-c, 3-b") {
+      setTimeout(() => {
+        const botMessage = BULLSEYE_FRAMEWORK_QUIZ_2
+        setMessages((prev) => [...prev, botMessage]);
+        setIsBotTyping(false);
+      }, 1500);
+      return;
+    }
+
+    // Default API call for other messages
     try {
       const response = await fetch("http://127.0.0.1:5000/api/ask", {
         method: "POST",
@@ -197,6 +231,7 @@ const ChatScreen = () => {
           pb: 20,
         }}
       >
+
         {/* Messages Container */}
         <Box sx={{ flexGrow: 1, overflowY: "auto", mb: 2 }}>
           <Stack spacing={2}>
@@ -227,7 +262,7 @@ const ChatScreen = () => {
                 >
                   <Typography
                     variant="body2"
-                    sx={{ lineHeight: 1.4, textAlign: "left" }} // <--- Left aligned
+                    sx={{ lineHeight: 1.4, textAlign: "left" }}
                   >
                     <ReactMarkdown>{message.text}</ReactMarkdown>
                   </Typography>
@@ -254,7 +289,7 @@ const ChatScreen = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 1,
+            gap: 2,
             position: "fixed",
             bottom: 0,
             left: 280,
@@ -264,26 +299,40 @@ const ChatScreen = () => {
             borderTop: `1px solid ${theme.palette.divider}`,
           }}
         >
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Type your message..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                handleSendMessage();
-              }
-            }}
-            sx={{ borderRadius: 2 }}
-          />
-          <Button
-            variant="contained"
-            onClick={handleSendMessage}
-            endIcon={<SendIcon />}
-          >
-            Send
-          </Button>
+          {/* Prompt Suggestions */}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {promptSuggestions.map((prompt, index) => (
+              <Chip
+                key={index}
+                label={prompt}
+                onClick={() => handlePromptClick(prompt)}
+                sx={{ cursor: 'pointer' }}
+                variant="outlined"
+              />
+            ))}
+          </Box>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Type your message..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSendMessage();
+                }
+              }}
+              sx={{ borderRadius: 2 }}
+            />
+            <Button
+              variant="contained"
+              onClick={handleSendMessage}
+              endIcon={<SendIcon />}
+            >
+              Send
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Box>
