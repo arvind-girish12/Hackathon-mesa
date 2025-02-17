@@ -13,7 +13,8 @@ import {
   Drawer,
   AppBar,
   Toolbar,
-  Stack
+  Stack,
+  Chip
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -23,25 +24,38 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 const ChatsScreen = () => {
   const navigate = useNavigate();
   
-  // Mock data - would come from API in real app
   const [chatSessions] = useState([
     {
       id: 1,
-      title: 'Introduction to Calculus',
-      lastMessage: 'Can you explain derivatives again?',
+      course: 'Launching & Leading Startups: MVP to Market',
+      session: 'Traction',
+      userMessage: 'What is traction for a circular economy startup?',
+      botMessage: 'Traction is measurable progress, such as CO2 offsets achieved or ESG partnership sign-ups.',
       timestamp: '2024-01-15 14:30'
     },
     {
-      id: 2, 
-      title: 'Linear Algebra Basics',
-      lastMessage: 'I need help with matrix multiplication',
+      id: 2,
+      course: 'Entrepreneurial Strategy',
+      session: 'Funding Models',
+      userMessage: 'Explain the difference between seed and series A funding.',
+      botMessage: 'Seed funding helps validate your idea, while Series A is for scaling with a proven business model.',
       timestamp: '2024-01-14 16:45'
     },
     {
       id: 3,
-      title: 'Probability Theory',
-      lastMessage: 'What is Bayes Theorem?',
+      course: 'Product Metrics & Execution',
+      session: 'Cohort Analysis',
+      userMessage: 'How can cohort analysis help a climate-tech startup?',
+      botMessage: 'It identifies user retention trends, e.g., tracking whether ESG webinar attendees are more loyal customers.',
       timestamp: '2024-01-13 09:15'
+    },
+    {
+      id: 4,
+      course: 'Launching & Leading Startups: MVP to Market',
+      session: 'Traction',
+      userMessage: 'Name one traction channel most suitable for B2B climate-tech startups.',
+      botMessage: 'Industry partnerships with ESG-focused enterprises are a strong channel.',
+      timestamp: '2024-01-12 11:20'
     }
   ]);
 
@@ -107,7 +121,7 @@ const ChatsScreen = () => {
         }}
       >
         <Typography variant="h4" sx={{ mb: 3 }}>
-          Chat History
+          Chat History (Last 10 Chats)
         </Typography>
 
         <Stack spacing={2}>
@@ -118,11 +132,15 @@ const ChatsScreen = () => {
               onClick={() => handleChatClick(chat.id)}
             >
               <CardContent>
-                <Typography variant="h6">
-                  {chat.title}
+                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                  <Chip label={chat.course} color="primary" />
+                  <Chip label={chat.session} color="secondary" />
+                </Box>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  <strong>You:</strong> {chat.userMessage}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Last message: {chat.lastMessage}
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  <strong>Jarvis:</strong> {chat.botMessage}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {chat.timestamp}
