@@ -66,15 +66,17 @@ const StyledListItem = styled(ListItem)(({ theme, active }) => ({
   }),
 }));
 
+const pulse = keyframes`
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+`;
+
 const ChatScreen = () => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([
-    {
-      text: "Hey, How can I help you?",
-      sender: "bot",
-      timestamp: new Date().toISOString(),
-    }
-  ]);
+  const theme = useTheme();
+
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeItem, setActiveItem] = useState('/chat');
@@ -86,10 +88,33 @@ const ChatScreen = () => {
     { text: 'Calendar', icon: <Calendar size={22} />, path: '/calendar' }
   ];
 
-  const defaultPrompts = [
-    "What is Bulls eye framework",
-    "Test my understanding"
-  ];
+  const TypingIndicator = () => (
+    <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+      <Paper
+        sx={{
+          p: 1.5,
+          bgcolor: theme.palette.background.paper,
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          {[0, 1, 2].map((i) => (
+            <Box
+              key={i}
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                bgcolor: "grey.600",
+                animation: `${pulse} 1.5s infinite`,
+                animationDelay: `${i * 0.2}s`,
+              }}
+            />
+          ))}
+        </Box>
+      </Paper>
+    </Box>
+  );
 
   const handleMenuClick = (path) => {
     setActiveItem(path);
@@ -109,38 +134,9 @@ const ChatScreen = () => {
       sender: "user",
       timestamp: new Date().toISOString(),
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
-    setIsLoading(true);
-
-    const loadingMessage = {
-      text: "...",
-      sender: "bot",
-      timestamp: new Date().toISOString(),
-      isLoading: true
-    };
-    setMessages(prev => [...prev, loadingMessage]);
-
-    if (message.trim().toLowerCase() === "test my understanding") {
-      // Show loading for 1.5 seconds before showing quiz
-      setTimeout(() => {
-        const botResponse = BULLSEYE_FRAMEWORK_QUIZ;
-        setMessages((prev) => prev.filter(msg => !msg.isLoading).concat([botResponse]));
-        setIsLoading(false);
-      }, 1500);
-      return;
-    }
-    // Check for quiz answers
-    const answer1B2C3B = message === "1-B, 2-C, 3-B";
-    if (answer1B2C3B) {
-      setTimeout(() => {
-        const botResponse = BULLSEYE_FRAMEWORK_QUIZ_2;
-        setMessages((prev) => prev.filter(msg => !msg.isLoading).concat([botResponse]));
-        setIsLoading(false);
-      }, 1500);
-      return;
-    }
+    setIsBotTyping(true);
 
     try {
       const response = await fetch("http://127.0.0.1:5000/api/ask", {
@@ -150,7 +146,6 @@ const ChatScreen = () => {
         },
         body: JSON.stringify({ question: message }),
       });
-
       const data = await response.json();
 
       // Add bot response
@@ -159,18 +154,11 @@ const ChatScreen = () => {
         sender: "bot",
         timestamp: new Date().toISOString(),
       };
-
-      setMessages((prev) => prev.filter(msg => !msg.isLoading).concat([botMessage]));
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error("Error sending message:", error);
-      const errorMessage = {
-        text: "Sorry, there was an error processing your request.",
-        sender: "bot",
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => prev.filter(msg => !msg.isLoading).concat([errorMessage]));
     } finally {
-      setIsLoading(false);
+      setIsBotTyping(false);
     }
   };
 
@@ -188,6 +176,11 @@ const ChatScreen = () => {
               key={item.text}
               active={activeItem === item.path ? 1 : 0}
               onClick={() => handleMenuClick(item.path)}
+              sx={{
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              }}
             >
               <ListItemIcon>
                 {item.icon}
@@ -198,7 +191,7 @@ const ChatScreen = () => {
         </List>
       </StyledDrawer>
 
-      {/* Main Content */}
+      {/* Main Chat Area */}
       <Box
         component="main"
         sx={{
@@ -210,8 +203,8 @@ const ChatScreen = () => {
           pb: 20,
         }}
       >
-        {/* Message Display */}
-        <Box sx={{ flexGrow: 1, mb: 2 }}>
+        {/* Messages Container */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", mb: 2 }}>
           <Stack spacing={2}>
             {messages.map((message, index) => (
               <Box
@@ -224,46 +217,45 @@ const ChatScreen = () => {
               >
                 <Paper
                   sx={{
-                    p: 2,
-                    maxWidth: "70%",
-                    backgroundColor:
-                      message.sender === "user" ? "#1976d2" : "#f5f5f5",
-                    color: message.sender === "user" ? "#fff" : "#000",
-                    borderRadius:
+                    display: "inline-block",
+                    p: 1.5,
+                    maxWidth: "60%",
+                    bgcolor:
+                      message.sender === "user" ? "primary.main" : "grey.100",
+                    color:
                       message.sender === "user"
-                        ? "15px 15px 0px 15px"
-                        : "15px 15px 15px 0px",
+                        ? "common.white"
+                        : "text.primary",
+                    borderRadius: 3,
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
                   }}
                 >
-                  {message.isLoading ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <>
-                      {/* Left-align text */}
-                      <Typography
-                        variant="body1"
-                        sx={{ textAlign: "left" }}
-                      >
-                        <ReactMarkdown>{message.text}</ReactMarkdown>
-                      </Typography>
-
-                      {/* Timestamp */}
-                      <Typography
-                        variant="caption"
-                        align="right"
-                        sx={{ display: "block", mt: 1 }}
-                      >
-                        {format(new Date(message.timestamp), "PPpp")}
-                      </Typography>
-                    </>
-                  )}
+                  <Typography
+                    variant="body2"
+                    sx={{ lineHeight: 1.4, textAlign: "left" }} // <--- Left aligned
+                  >
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      mt: 1,
+                      textAlign: "right",
+                      opacity: 0.7,
+                    }}
+                  >
+                    {format(new Date(message.timestamp), "PPpp")}
+                  </Typography>
                 </Paper>
               </Box>
             ))}
+            {isBotTyping && <TypingIndicator />}
           </Stack>
         </Box>
 
-        {/* Input Box */}
+        {/* Input Area */}
         <Box
           sx={{
             display: "flex",
@@ -273,45 +265,31 @@ const ChatScreen = () => {
             bottom: 0,
             left: 280,
             right: 0,
-            p: 3,
-            backgroundColor: "#fff",
+            p: 2,
+            bgcolor: "background.paper",
+            borderTop: `1px solid ${theme.palette.divider}`,
           }}
         >
-          {/* Suggested Prompts */}
-          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-            {defaultPrompts.map((prompt) => (
-              <Chip
-                key={prompt}
-                label={prompt}
-                onClick={() => handlePromptClick(prompt)}
-                clickable
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-          </Stack>
-
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Type your message..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  handleSendMessage();
-                }
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={() => handleSendMessage()}
-              endIcon={<SendIcon />}
-            >
-              Send
-            </Button>
-          </Box>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Type your message..."
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage();
+              }
+            }}
+            sx={{ borderRadius: 2 }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleSendMessage}
+            endIcon={<SendIcon />}
+          >
+            Send
+          </Button>
         </Box>
       </Box>
     </Box>
