@@ -9,9 +9,20 @@ import {
   CardActionArea,
   Chip,
   Stack,
-  IconButton
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  AppBar,
+  Toolbar
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import VideoCallIcon from '@mui/icons-material/VideoCall';
+import ChatIcon from '@mui/icons-material/Chat';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const DashboardScreen = () => {
   const navigate = useNavigate();
@@ -33,14 +44,72 @@ const DashboardScreen = () => {
     }
   ]);
 
+  const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Sessions', icon: <VideoCallIcon />, path: '/sessions' },
+    { text: 'Chats', icon: <ChatIcon />, path: '/chats' },
+    { text: 'Calendar', icon: <CalendarMonthIcon />, path: '/calendar' }
+  ];
+
   const handleSessionClick = (sessionId) => {
-    navigate(`/session/${sessionId}`);
+    navigate(`/sessions`);
+  };
+
+  const handleMenuClick = (path) => {
+    navigate(path);
   };
 
   return (
-    <Container component="main">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography component="h1" variant="h4" gutterBottom>
+    <Box sx={{ display: 'flex' }}>
+      {/* Top Header App Bar */}
+      <AppBar position="fixed">
+        <Toolbar>
+          <Typography variant="h6" noWrap component="div">
+            Mind Palace
+          </Typography>
+          <Typography variant="subtitle1" sx={{ ml: 2 }}>
+            Your Personal Learning Companion
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      {/* Left Menu */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 240,
+          '& .MuiDrawer-paper': {
+            width: 240,
+            marginTop: '64px'
+          }
+        }}
+      >
+        <List>
+          {menuItems.map((item) => (
+            <ListItem 
+              button 
+              key={item.text}
+              onClick={() => handleMenuClick(item.path)}
+            >
+              <ListItemIcon>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+
+      {/* Main Content Area */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          marginTop: '64px',
+          p: 3
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 2 }}>
           Dashboard
         </Typography>
         
@@ -52,7 +121,7 @@ const DashboardScreen = () => {
           Upcoming Sessions
         </Typography>
 
-        <Stack spacing={2}>
+        <Stack spacing={2} sx={{ width: '100%' }}>
           {upcomingSessions.map((session) => (
             <Card key={session.id}>
               <CardActionArea onClick={() => handleSessionClick(session.id)}>
@@ -84,7 +153,7 @@ const DashboardScreen = () => {
           ))}
         </Stack>
       </Box>
-    </Container>
+    </Box>
   );
 };
 
