@@ -14,19 +14,31 @@ import {
   Toolbar,
   Stack,
   Paper,
+  keyframes,
+  useTheme,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { format } from "date-fns";
+
 import ChatIcon from "@mui/icons-material/Chat";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SendIcon from "@mui/icons-material/Send";
 
+const pulse = keyframes`
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+`;
+
 const ChatScreen = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [isBotTyping, setIsBotTyping] = useState(false);
 
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
@@ -34,6 +46,34 @@ const ChatScreen = () => {
     { text: "Chats", icon: <ChatIcon />, path: "/chats" },
     { text: "Calendar", icon: <CalendarMonthIcon />, path: "/calendar" },
   ];
+
+  const TypingIndicator = () => (
+    <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+      <Paper
+        sx={{
+          p: 1.5,
+          bgcolor: theme.palette.background.paper,
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          {[0, 1, 2].map((i) => (
+            <Box
+              key={i}
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                bgcolor: "grey.600",
+                animation: `${pulse} 1.5s infinite`,
+                animationDelay: `${i * 0.2}s`,
+              }}
+            />
+          ))}
+        </Box>
+      </Paper>
+    </Box>
+  );
 
   const handleMenuClick = (path) => {
     navigate(path);
@@ -47,9 +87,9 @@ const ChatScreen = () => {
       sender: "user",
       timestamp: new Date().toISOString(),
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
+    setIsBotTyping(true);
 
     try {
       const response = await fetch("http://127.0.0.1:5000/api/ask", {
@@ -57,7 +97,6 @@ const ChatScreen = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: inputMessage }),
       });
-
       const data = await response.json();
 
       const botMessage = {
@@ -65,34 +104,42 @@ const ChatScreen = () => {
         sender: "bot",
         timestamp: new Date().toISOString(),
       };
-
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error("Error sending message:", error);
+    } finally {
+      setIsBotTyping(false);
     }
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* AppBar */}
-      <AppBar position="fixed">
+    <Box
+      sx={{
+        display: "flex",
+        bgcolor: "background.default",
+        color: "text.primary",
+      }}
+    >
+      {/* Top App Bar */}
+      <AppBar position="fixed" elevation={1}>
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap>
             Chat with Jarvis
           </Typography>
         </Toolbar>
       </AppBar>
 
-      {/* Drawer */}
+      {/* Sidebar Drawer */}
       <Drawer
         variant="permanent"
         sx={{
           width: 240,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
+          [`& .MuiDrawer-paper`]: {
             width: 240,
             boxSizing: "border-box",
-            marginTop: "64px",
+            mt: "64px", // offset for AppBar
+            borderRight: `1px solid ${theme.palette.divider}`,
           },
         }}
       >
@@ -102,15 +149,22 @@ const ChatScreen = () => {
               button
               key={item.text}
               onClick={() => handleMenuClick(item.path)}
+              sx={{
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              }}
             >
-              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemIcon sx={{ color: "text.secondary" }}>
+                {item.icon}
+              </ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItem>
           ))}
         </List>
       </Drawer>
 
-      {/* Main Content */}
+      {/* Main Chat Area */}
       <Box
         component="main"
         sx={{
@@ -118,12 +172,12 @@ const ChatScreen = () => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
-          marginTop: "64px",
+          mt: "64px", // offset for AppBar
           p: 3,
           pb: 10,
         }}
       >
-        {/* Message Display */}
+        {/* Messages Container */}
         <Box sx={{ flexGrow: 1, overflowY: "auto", mb: 2 }}>
           <Stack spacing={2}>
             {messages.map((message, index) => (
@@ -137,40 +191,45 @@ const ChatScreen = () => {
               >
                 <Paper
                   sx={{
-                    p: 2,
-                    maxWidth: "70%",
-                    backgroundColor:
-                      message.sender === "user" ? "#1976d2" : "#f5f5f5",
-                    color: message.sender === "user" ? "#fff" : "#000",
-                    borderRadius:
+                    display: "inline-block",
+                    p: 1.5,
+                    maxWidth: "60%",
+                    bgcolor:
+                      message.sender === "user" ? "primary.main" : "grey.100",
+                    color:
                       message.sender === "user"
-                        ? "15px 15px 0px 15px"
-                        : "15px 15px 15px 0px",
+                        ? "common.white"
+                        : "text.primary",
+                    borderRadius: 3,
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
                   }}
                 >
-                  {/* Left-align text */}
                   <Typography
-                    variant="body1"
-                    sx={{ textAlign: "left" }} // Ensures left alignment
+                    variant="body2"
+                    sx={{ lineHeight: 1.4, textAlign: "left" }} // <--- Left aligned
                   >
                     <ReactMarkdown>{message.text}</ReactMarkdown>
                   </Typography>
-
-                  {/* Timestamp */}
                   <Typography
                     variant="caption"
-                    align="right"
-                    sx={{ display: "block", mt: 1 }}
+                    sx={{
+                      display: "block",
+                      mt: 1,
+                      textAlign: "right",
+                      opacity: 0.7,
+                    }}
                   >
                     {format(new Date(message.timestamp), "PPpp")}
                   </Typography>
                 </Paper>
               </Box>
             ))}
+            {isBotTyping && <TypingIndicator />}
           </Stack>
         </Box>
 
-        {/* Input Box */}
+        {/* Input Area */}
         <Box
           sx={{
             display: "flex",
@@ -179,8 +238,9 @@ const ChatScreen = () => {
             bottom: 0,
             left: 240,
             right: 0,
-            p: 3,
-            backgroundColor: "#fff",
+            p: 2,
+            bgcolor: "background.paper",
+            borderTop: `1px solid ${theme.palette.divider}`,
           }}
         >
           <TextField
@@ -194,6 +254,7 @@ const ChatScreen = () => {
                 handleSendMessage();
               }
             }}
+            sx={{ borderRadius: 2 }}
           />
           <Button
             variant="contained"
