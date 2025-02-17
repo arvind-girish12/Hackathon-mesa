@@ -25,6 +25,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SendIcon from "@mui/icons-material/Send";
+import { BULLSEYE_FRAMEWORK_QUIZ, BULLSEYE_FRAMEWORK_QUIZ_2 } from "./constant";
 
 const pulse = keyframes`
   0% { opacity: 0.3; }
@@ -79,11 +80,16 @@ const ChatScreen = () => {
     navigate(path);
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const handlePromptClick = (prompt) => {
+    setInputMessage(prompt);
+    handleSendMessage(prompt);
+  };
+
+  const handleSendMessage = async (message = inputMessage) => {
+    if (!message.trim()) return;
 
     const userMessage = {
-      text: inputMessage,
+      text: message,
       sender: "user",
       timestamp: new Date().toISOString(),
     };
@@ -94,11 +100,14 @@ const ChatScreen = () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/api/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: inputMessage }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: message }),
       });
       const data = await response.json();
 
+      // Add bot response
       const botMessage = {
         text: data.answer || "I'm sorry, I didn't understand that.",
         sender: "bot",
@@ -174,7 +183,7 @@ const ChatScreen = () => {
           flexDirection: "column",
           mt: "64px", // offset for AppBar
           p: 3,
-          pb: 10,
+          pb: 20,
         }}
       >
         {/* Messages Container */}
@@ -233,6 +242,7 @@ const ChatScreen = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
             gap: 1,
             position: "fixed",
             bottom: 0,
