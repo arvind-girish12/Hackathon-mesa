@@ -143,10 +143,10 @@ const SignUpScreen = () => {
                   {feature.icon}
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" color="white" align="left">
+                  <Typography variant="h6" color="white" align="left" sx={{ fontWeight: 500 }}>
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="primary.light" align="left">
+                  <Typography variant="body2" color="white" align="left" sx={{ fontWeight: 500 }}>
                     {feature.description}
                   </Typography>
                 </Box>
@@ -159,16 +159,16 @@ const SignUpScreen = () => {
           <Card sx={{ bgcolor: 'primary.dark', mb: 3 }}>
             <CardContent>
               <FormatQuoteIcon sx={{ fontSize: 40, color: 'primary.light' }} />
-              <Typography variant="body1" color="white" gutterBottom align="left">
+              <Typography variant="body1" color="white" gutterBottom align="left" sx={{ fontWeight: 500 }}>
                 "Mind Palace helped me ace my MBA sessions! The AI-driven summaries are a game-changer."
               </Typography>
-              <Typography variant="subtitle2" color="primary.light" align="left">
+              <Typography variant="subtitle2" color="white" align="left" sx={{ fontWeight: 500 }}>
                 - John D., MBA Student, ISB
               </Typography>
             </CardContent>
           </Card>
 
-          <Typography variant="h6" align="left">
+          <Typography variant="h6" align="left" sx={{ fontWeight: 500 }}>
             Join 5,000+ MBA students excelling with Mind Palace!
           </Typography>
         </Box>

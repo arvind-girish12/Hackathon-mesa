@@ -24,81 +24,117 @@ import {
   FormControl,
   InputLabel,
   Grid,
-  Divider
+  Divider,
+  styled
 } from '@mui/material';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import VideoCallIcon from '@mui/icons-material/VideoCall';
-import ChatIcon from '@mui/icons-material/Chat';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { 
+  Layout,
+  Video,
+  MessageSquare,
+  Calendar
+} from 'react-feather';
+import logo from '../../assets/logo.svg';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SortIcon from '@mui/icons-material/Sort';
+
+// Styled components for sidebar
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: 280,
+  '& .MuiDrawer-paper': {
+    width: 280,
+    backgroundColor: '#f8f9fa',
+    border: 'none',
+    boxShadow: '1px 0 8px rgba(0,0,0,0.05)',
+    borderRadius: '0 12px 12px 0',
+    padding: theme.spacing(2, 0)
+  }
+}));
+
+const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+  margin: theme.spacing(0.5, 2),
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 8,
+  fontFamily: "'Inter', sans-serif",
+  transition: 'all 0.2s ease',
+  
+  '& .MuiListItemIcon-root': {
+    minWidth: 42,
+    color: active ? theme.palette.primary.main : '#64748b',
+    transition: 'color 0.2s ease'
+  },
+  
+  '& .MuiListItemText-primary': {
+    fontSize: '0.95rem',
+    fontWeight: active ? 600 : 500,
+    color: active ? theme.palette.primary.main : '#334155',
+    letterSpacing: '0.02em'
+  },
+
+  ...(active && {
+    backgroundColor: '#e8f2ff',
+  }),
+
+  '&:hover': {
+    backgroundColor: active ? '#e8f2ff' : '#f1f5f9',
+    '& .MuiListItemIcon-root': {
+      color: theme.palette.primary.main
+    },
+    '& .MuiListItemText-primary': {
+      color: theme.palette.primary.main
+    }
+  }
+}));
 
 const DashboardScreen = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterBy, setFilterBy] = useState('all');
   const [sortBy, setSortBy] = useState('date');
+  const [activeItem, setActiveItem] = useState('/dashboard');
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Sessions', icon: <VideoCallIcon />, path: '/sessions' },
-    { text: 'Chats', icon: <ChatIcon />, path: '/chats' },
-    { text: 'Calendar', icon: <CalendarMonthIcon />, path: '/calendar' }
+    { text: 'Dashboard', icon: <Layout size={22} />, path: '/dashboard' },
+    { text: 'Sessions', icon: <Video size={22} />, path: '/sessions' },
+    { text: 'Chats', icon: <MessageSquare size={22} />, path: '/chats' },
+    { text: 'Calendar', icon: <Calendar size={22} />, path: '/calendar' }
   ];
 
   const handleMenuClick = (path) => {
+    setActiveItem(path);
     navigate(path);
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* Top Header App Bar */}
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Mind Palace
-          </Typography>
-          <Typography variant="subtitle1" sx={{ ml: 2 }}>
-            Your Personal Learning Companion
-          </Typography>
-        </Toolbar>
-      </AppBar>
 
       {/* Left Menu */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: 240,
-          '& .MuiDrawer-paper': {
-            width: 240,
-            marginTop: '64px'
-          }
-        }}
-      >
+      <StyledDrawer variant="permanent">
+        <Box sx={{ p: 2, mt: 0 }}>
+          <img src={logo} alt="Mind Palace Logo" style={{ height: '150px' }} />
+        </Box>
         <List>
           {menuItems.map((item) => (
-            <ListItem 
-              button 
+            <StyledListItem
+              button
               key={item.text}
+              active={activeItem === item.path ? 1 : 0}
               onClick={() => handleMenuClick(item.path)}
             >
               <ListItemIcon>
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} />
-            </ListItem>
+            </StyledListItem>
           ))}
         </List>
-      </Drawer>
+      </StyledDrawer>
 
       {/* Main Content Area */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          marginTop: '64px',
           p: 3,
           maxWidth: '100vw'
         }}

@@ -4,9 +4,6 @@ import {
   Box,
   Typography,
   Container,
-  AppBar,
-  Toolbar,
-  Drawer,
   List,
   ListItem,
   ListItemIcon,
@@ -14,18 +11,62 @@ import {
   Paper,
   Grid,
   Button,
-  IconButton
+  IconButton,
+  styled,
+  Drawer
 } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import VideoCallIcon from '@mui/icons-material/VideoCall';
-import ChatIcon from '@mui/icons-material/Chat';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { 
+  Layout,
+  Video,
+  MessageSquare,
+  Calendar
+} from 'react-feather';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import logo from '../../assets/logo.svg';
+
+// Styled components for sidebar
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: 280,
+  '& .MuiDrawer-paper': {
+    width: 280,
+    backgroundColor: '#f8f9fa',
+    border: 'none',
+    boxShadow: '1px 0 8px rgba(0,0,0,0.05)',
+    borderRadius: '0 12px 12px 0',
+    padding: theme.spacing(2, 0)
+  }
+}));
+
+const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+  margin: theme.spacing(0.5, 2),
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 8,
+  fontFamily: "'Inter', sans-serif",
+  transition: 'all 0.2s ease',
+  
+  '& .MuiListItemIcon-root': {
+    minWidth: 42,
+    color: active ? theme.palette.primary.main : '#64748b',
+    transition: 'color 0.2s ease'
+  },
+  
+  '& .MuiListItemText-primary': {
+    fontSize: '0.95rem',
+    fontWeight: active ? 600 : 500,
+    color: active ? theme.palette.primary.main : '#334155',
+    letterSpacing: '0.02em'
+  },
+
+  ...(active && {
+    backgroundColor: '#e8f2ff',
+  }),
+}));
 
 const CalendarScreen = () => {
   const navigate = useNavigate();
   const [currentDate] = useState(new Date());
+  const [activeItem, setActiveItem] = useState('/calendar');
 
   const [sessions] = useState([
     {
@@ -108,13 +149,14 @@ const CalendarScreen = () => {
   ]);
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Sessions', icon: <VideoCallIcon />, path: '/sessions' },
-    { text: 'Chats', icon: <ChatIcon />, path: '/chats' },
-    { text: 'Calendar', icon: <CalendarMonthIcon />, path: '/calendar' }
+    { text: 'Dashboard', icon: <Layout size={22} />, path: '/dashboard' },
+    { text: 'Sessions', icon: <Video size={22} />, path: '/sessions' },
+    { text: 'Chats', icon: <MessageSquare size={22} />, path: '/chats' },
+    { text: 'Calendar', icon: <Calendar size={22} />, path: '/calendar' }
   ];
 
   const handleMenuClick = (path) => {
+    setActiveItem(path);
     navigate(path);
   };
 
@@ -124,48 +166,31 @@ const CalendarScreen = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Mind Palace
-          </Typography>
-          <Typography variant="subtitle1" sx={{ ml: 2 }}>
-            Your Personal Learning Companion
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: 240,
-          '& .MuiDrawer-paper': {
-            width: 240,
-            marginTop: '64px'
-          }
-        }}
-      >
+      <StyledDrawer variant="permanent">
+        <Box sx={{ p: 2, mt: 0 }}>
+          <img src={logo} alt="Mind Palace Logo" style={{ height: '150px' }} />
+        </Box>
         <List>
           {menuItems.map((item) => (
-            <ListItem 
-              button 
+            <StyledListItem
+              button
               key={item.text}
+              active={activeItem === item.path ? 1 : 0}
               onClick={() => handleMenuClick(item.path)}
             >
               <ListItemIcon>
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} />
-            </ListItem>
+            </StyledListItem>
           ))}
         </List>
-      </Drawer>
+      </StyledDrawer>
 
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          marginTop: '64px',
           p: 3
         }}
       >

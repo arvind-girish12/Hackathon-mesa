@@ -8,7 +8,6 @@ import {
   Link,
   Container,
   Alert,
-  Grid,
   Card,
   CardContent,
   Stack,
@@ -20,6 +19,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import logo from '../../assets/logo.svg';
 
 const LogInScreen = () => {
   const navigate = useNavigate();
@@ -62,11 +62,6 @@ const LogInScreen = () => {
       description: "Structured modules crafted for deep MBA learning."
     },
     {
-      icon: <CalendarMonthIcon />,
-      title: "Calendar",
-      description: "Plan your study schedule with an integrated smart calendar."
-    },
-    {
       icon: <PsychologyIcon />,
       title: "Personalized Learning",
       description: "AI adapts to your style—Visual, Auditory, or Kinesthetic."
@@ -75,50 +70,59 @@ const LogInScreen = () => {
 
   return (
     <Box sx={{ 
-      height: '100vh', 
+      minHeight: '100vh',
       display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '100vw'
+      width: '100%',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
     }}>
-      {/* Left Side - Mind Palace Intro */}
+      {/* Left Side - Feature Showcase */}
       <Box 
         sx={{ 
           width: '50%',
-          maxWidth: '800px',
-          bgcolor: 'primary.main',
+          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
           color: 'white',
-          p: 4,
+          p: 6,
           display: 'flex',
           flexDirection: 'column',
-          height: '100vh',
-          overflow: 'hidden'
+          minHeight: '100vh'
         }}
       >
-        <Box sx={{ mb: 6 }}>
-          <Typography variant="h3" gutterBottom align="left">
-            Mind Palace
-          </Typography>
-          <Typography variant="h5" gutterBottom align="left">
+        <Box sx={{ mb: 8 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+            <img src={logo} alt="Mind Palace Logo" style={{ height: '200px' }} />
+            <Typography variant="h2" gutterBottom sx={{ fontWeight: 700 }}>
+              Mind Palace
+            </Typography>
+          </Box>
+          <Typography variant="h5" sx={{ opacity: 0.9, mb: 3 }}>
             Your AI-Powered MBA Study Companion
           </Typography>
-          <Typography variant="body1" align="left">
-            Master MBA concepts effortlessly with AI-driven insights and structured learning.
+          <Typography variant="body1" sx={{ opacity: 0.8 }}>
+            Elevate your MBA journey with intelligent learning assistance and structured guidance
           </Typography>
         </Box>
 
-        <Stack spacing={3} sx={{ flex: 1, overflow: 'hidden' }}>
+        <Stack spacing={3} sx={{ flex: 1 }}>
           {features.map((feature, index) => (
-            <Card key={index} sx={{ bgcolor: 'primary.dark' }}>
-              <CardContent sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                <Avatar sx={{ bgcolor: 'primary.light' }}>
+            <Card key={index} sx={{ 
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: 2
+            }}>
+              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 3, p: 3 }}>
+                <Avatar sx={{ 
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  width: 56,
+                  height: 56
+                }}>
                   {feature.icon}
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" color="white" align="left">
+                  <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, color: 'white', textAlign: 'left' }}>
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="primary.light" align="left">
+                  <Typography variant="body2" sx={{ opacity: 0.8, fontWeight: 600, color: 'white', textAlign: 'left' }}>
                     {feature.description}
                   </Typography>
                 </Box>
@@ -126,67 +130,47 @@ const LogInScreen = () => {
             </Card>
           ))}
         </Stack>
-
-        <Box sx={{ mt: 4 }}>
-          <Card sx={{ bgcolor: 'primary.dark', mb: 3 }}>
-            <CardContent>
-              <FormatQuoteIcon sx={{ fontSize: 40, color: 'primary.light' }} />
-              <Typography variant="body1" color="white" gutterBottom align="left">
-                "Mind Palace helped me ace my MBA sessions! The AI-driven summaries are a game-changer."
-              </Typography>
-              <Typography variant="subtitle2" color="primary.light" align="left">
-                - John D., MBA Student, ISB
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Typography variant="h6" align="left">
-            Join 5,000+ MBA students excelling with Mind Palace!
-          </Typography>
-        </Box>
       </Box>
 
       {/* Right Side - Login Form */}
-      <Paper elevation={3} sx={{ 
-        width: '400px',
-        height: '100vh',
+      <Box sx={{ 
+        width: '50%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflowY: 'auto'
+        p: 6
       }}>
-        <Container maxWidth="xs">
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              py: 4
-            }}
-          >
-            <Typography component="h1" variant="h4" gutterBottom align="left">
+        <Paper elevation={3} sx={{ 
+          p: 6,
+          borderRadius: 3,
+          width: '100%',
+          maxWidth: 480
+        }}>
+          <Container>
+            <Typography variant="h3" gutterBottom sx={{ fontWeight: 700, mb: 4 }}>
               Welcome Back
             </Typography>
 
             {error && (
-              <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
                 {error}
               </Alert>
             )}
 
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+            <Box component="form" onSubmit={handleSubmit}>
               <TextField
                 margin="normal"
                 required
                 fullWidth
                 id="emailUsername"
-                label="Email Address or Username"
+                label="Email Address"
                 name="emailUsername"
-                placeholder="Your email or username"
+                placeholder="Enter your email"
                 autoComplete="email"
                 autoFocus
                 value={formData.emailUsername}
                 onChange={handleInputChange}
+                sx={{ mb: 3 }}
               />
               
               <TextField
@@ -197,41 +181,54 @@ const LogInScreen = () => {
                 label="Password"
                 type="password"
                 id="password"
-                placeholder="Your password"
+                placeholder="Enter your password"
                 autoComplete="current-password"
                 value={formData.password}
                 onChange={handleInputChange}
+                sx={{ mb: 4 }}
               />
 
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                size="large"
+                sx={{ 
+                  py: 2,
+                  mb: 3,
+                  borderRadius: 2,
+                  fontSize: '1.1rem'
+                }}
               >
-                Log In
+                Sign In
               </Button>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
                 <Link 
                   href="#" 
-                  variant="body2" 
+                  variant="body1"
                   onClick={() => navigate('/forgot-password')}
+                  sx={{ textDecoration: 'none' }}
                 >
                   Forgot Password?
                 </Link>
                 <Link 
                   href="#" 
-                  variant="body2" 
+                  variant="body1"
                   onClick={() => navigate('/signup')}
+                  sx={{ textDecoration: 'none' }}
                 >
-                  Don't have an account? Sign Up
+                  Create Account
                 </Link>
               </Box>
             </Box>
-          </Box>
-        </Container>
-      </Paper>
+          </Container>
+        </Paper>
+      </Box>
     </Box>
   );
 };

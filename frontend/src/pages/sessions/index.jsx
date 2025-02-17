@@ -9,8 +9,6 @@ import {
   Button,
   Stack,
   Divider,
-  AppBar,
-  Toolbar,
   Drawer,
   List,
   ListItem,
@@ -19,18 +17,90 @@ import {
   Rating,
   TextField,
   CircularProgress,
-  Fab
+  Fab,
+  styled
 } from '@mui/material';
+import { 
+  Layout,
+  Video,
+  MessageSquare,
+  Calendar
+} from 'react-feather';
 import ChatIcon from '@mui/icons-material/Chat';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import VideoCallIcon from '@mui/icons-material/VideoCall';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import UploadIcon from '@mui/icons-material/Upload';
 import PersonIcon from '@mui/icons-material/Person';
+import logo from '../../assets/logo.svg';
+
+// Styled components for sidebar
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: 280,
+  '& .MuiDrawer-paper': {
+    width: 280,
+    backgroundColor: '#f8f9fa',
+    border: 'none',
+    boxShadow: '1px 0 8px rgba(0,0,0,0.05)',
+    borderRadius: '0 12px 12px 0',
+    padding: theme.spacing(2, 0)
+  }
+}));
+
+const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+  margin: theme.spacing(0.5, 2),
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 8,
+  fontFamily: "'Inter', sans-serif",
+  transition: 'all 0.2s ease',
+  
+  '& .MuiListItemIcon-root': {
+    minWidth: 42,
+    color: active ? theme.palette.primary.main : '#64748b',
+    transition: 'color 0.2s ease'
+  },
+  
+  '& .MuiListItemText-primary': {
+    fontSize: '0.95rem',
+    fontWeight: active ? 600 : 500,
+    color: active ? theme.palette.primary.main : '#334155',
+    letterSpacing: '0.02em'
+  },
+
+  ...(active && {
+    backgroundColor: '#e8f2ff',
+  }),
+
+  '&:hover': {
+    backgroundColor: active ? '#e8f2ff' : '#f1f5f9',
+    '& .MuiListItemIcon-root': {
+      color: theme.palette.primary.main
+    },
+    '& .MuiListItemText-primary': {
+      color: theme.palette.primary.main
+    }
+  }
+}));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  backgroundColor: '#fafafa',
+  borderRadius: 12,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+  marginBottom: theme.spacing(3),
+  '& .MuiCardContent-root': {
+    padding: theme.spacing(3)
+  }
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '1.25rem',
+  fontWeight: 600,
+  marginBottom: theme.spacing(2),
+  paddingBottom: theme.spacing(1),
+  borderBottom: '2px solid #f0f0f0'
+}));
 
 const SessionScreen = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [activeItem, setActiveItem] = useState('/sessions');
   const [sessionData, setSessionData] = useState({
     title: 'The Bullseye Framework for Traction',
     instructor: 'Ray Titus',
@@ -47,10 +117,10 @@ const SessionScreen = () => {
   });
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Sessions', icon: <VideoCallIcon />, path: '/sessions' },
-    { text: 'Chats', icon: <ChatIcon />, path: '/chats' },
-    { text: 'Calendar', icon: <CalendarMonthIcon />, path: '/calendar' }
+    { text: 'Dashboard', icon: <Layout size={22} />, path: '/dashboard' },
+    { text: 'Sessions', icon: <Video size={22} />, path: '/sessions' },
+    { text: 'Chats', icon: <MessageSquare size={22} />, path: '/chats' },
+    { text: 'Calendar', icon: <Calendar size={22} />, path: '/calendar' }
   ];
 
   const handleChatbotClick = () => {
@@ -58,6 +128,7 @@ const SessionScreen = () => {
   };
 
   const handleMenuClick = (path) => {
+    setActiveItem(path);
     navigate(path);
   };
 
@@ -94,54 +165,38 @@ const SessionScreen = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div" align="left">
-            Mind Palace
-          </Typography>
-          <Typography variant="subtitle1" sx={{ ml: 2 }} align="left">
-            Your Personal Learning Companion
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: 240,
-          '& .MuiDrawer-paper': {
-            width: 240,
-            marginTop: '64px'
-          }
-        }}
-      >
+      <StyledDrawer variant="permanent">
+        <Box sx={{ p: 2, mt: 0 }}>
+          <img src={logo} alt="Mind Palace Logo" style={{ height: '150px' }} />
+        </Box>
         <List>
           {menuItems.map((item) => (
-            <ListItem 
-              button 
+            <StyledListItem
+              button
               key={item.text}
+              active={activeItem === item.path ? 1 : 0}
               onClick={() => handleMenuClick(item.path)}
             >
               <ListItemIcon>
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} />
-            </ListItem>
+            </StyledListItem>
           ))}
         </List>
-      </Drawer>
+      </StyledDrawer>
 
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          marginTop: '64px',
-          p: 3
+          p: 4,
+          backgroundColor: '#f5f5f5'
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Box>
-            <Typography variant="h4" align="left">
+            <Typography variant="h4" sx={{ fontWeight: 600 }} align="left">
               {sessionData.title}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
@@ -175,22 +230,22 @@ const SessionScreen = () => {
         </Box>
 
         <Stack spacing={3}>
-          <Card>
+          <StyledCard>
             <CardContent>
-              <Typography variant="h6" gutterBottom align="left">
+              <SectionTitle variant="h6" gutterBottom align="left">
                 Session Summary
-              </Typography>
+              </SectionTitle>
               <Typography variant="body1" align="left">
                 {sessionData.summary || 'Session summary will be available after content upload.'}
               </Typography>
             </CardContent>
-          </Card>
+          </StyledCard>
 
-          <Card>
+          <StyledCard>
             <CardContent>
-              <Typography variant="h6" gutterBottom align="left">
+              <SectionTitle variant="h6" gutterBottom align="left">
                 Key Questions
-              </Typography>
+              </SectionTitle>
               <Stack spacing={1}>
                 {sessionData.keyQuestions.length > 0 ? (
                   sessionData.keyQuestions.map((question, index) => (
@@ -205,13 +260,13 @@ const SessionScreen = () => {
                 )}
               </Stack>
             </CardContent>
-          </Card>
+          </StyledCard>
 
-          <Card>
+          <StyledCard>
             <CardContent>
-              <Typography variant="h6" gutterBottom align="left">
+              <SectionTitle variant="h6" gutterBottom align="left">
                 Insights & Learning Focus
-              </Typography>
+              </SectionTitle>
               <Stack spacing={1}>
                 {sessionData.insights.length > 0 ? (
                   sessionData.insights.map((insight, index) => (
@@ -226,13 +281,13 @@ const SessionScreen = () => {
                 )}
               </Stack>
             </CardContent>
-          </Card>
+          </StyledCard>
 
-          <Card>
+          <StyledCard>
             <CardContent>
-              <Typography variant="h6" gutterBottom align="left">
+              <SectionTitle variant="h6" gutterBottom align="left">
                 Preparation Materials
-              </Typography>
+              </SectionTitle>
               <Stack spacing={1}>
                 {sessionData.preparationMaterials.map((material, index) => (
                   <Typography key={index} variant="body1" align="left">
@@ -241,13 +296,13 @@ const SessionScreen = () => {
                 ))}
               </Stack>
             </CardContent>
-          </Card>
+          </StyledCard>
 
-          <Card>
+          <StyledCard>
             <CardContent>
-              <Typography variant="h6" gutterBottom align="left">
+              <SectionTitle variant="h6" gutterBottom align="left">
                 Session Notes
-              </Typography>
+              </SectionTitle>
               <TextField
                 fullWidth
                 multiline
@@ -256,13 +311,13 @@ const SessionScreen = () => {
                 variant="outlined"
               />
             </CardContent>
-          </Card>
+          </StyledCard>
 
-          <Card>
+          <StyledCard>
             <CardContent>
-              <Typography variant="h6" gutterBottom align="left">
+              <SectionTitle variant="h6" gutterBottom align="left">
                 Session Feedback
-              </Typography>
+              </SectionTitle>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="subtitle1" gutterBottom align="left">
                   Rate this session:
@@ -277,7 +332,7 @@ const SessionScreen = () => {
                 variant="outlined"
               />
             </CardContent>
-          </Card>
+          </StyledCard>
         </Stack>
 
         <Fab
