@@ -66,12 +66,6 @@ const StyledListItem = styled(ListItem)(({ theme, active }) => ({
   }),
 }));
 
-const pulse = keyframes`
-  0% { opacity: 0.3; }
-  50% { opacity: 1; }
-  100% { opacity: 0.3; }
-`;
-
 const ChatScreen = () => {
   const navigate = useNavigate();
   const theme = useTheme();
