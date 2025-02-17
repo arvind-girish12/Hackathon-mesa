@@ -39,3 +39,41 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+
+# Virtual environment
+venv/
+.env
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Flask environment files
+.flaskenv
+
+# Logs and temporary files
+logs/
+*.log
+*.out
+*.err
+*.pid
+*.json
+*.sqlite3
+
+# Jupyter Notebook checkpoints (if used)
+.ipynb_checkpoints/
+
+# VS Code settings and metadata
+.vscode/
+
+# MacOS system files
+.DS_Store
+
+# Python dependency management
+pip-wheel-metadata/
+*.egg-info/
+
