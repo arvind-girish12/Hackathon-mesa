@@ -9,6 +9,7 @@ import Onboarding from './pages/onboarding/index'
 import SessionScreen from './pages/sessions/index'
 import ChatScreen from './pages/chat/index'
 import Chats from './pages/chats/index'
+import CalendarScreen from './pages/calendar/index'
 // import Chat from './routes/Chat'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/sessions" element={<SessionScreen />} />
         <Route path="/chatbot" element={<ChatScreen />} />
         <Route path="/chats" element={<Chats />} />
+        <Route path="/calendar" element={<CalendarScreen />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

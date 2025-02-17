@@ -16,33 +16,30 @@ import {
   ListItemIcon,
   ListItemText,
   AppBar,
-  Toolbar
+  Toolbar,
+  LinearProgress,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Divider
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import ChatIcon from '@mui/icons-material/Chat';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import SortIcon from '@mui/icons-material/Sort';
 
 const DashboardScreen = () => {
   const navigate = useNavigate();
-  // Temporary mock data - would come from API/props in real app
-  const [upcomingSessions] = useState([
-    {
-      id: 1,
-      title: 'Introduction to Calculus',
-      subject: 'Mathematics',
-      dateTime: '2024-02-20T14:00:00',
-      status: 'Pre-reads Ready'
-    },
-    {
-      id: 2, 
-      title: 'Chemical Bonding',
-      subject: 'Chemistry',
-      dateTime: '2024-02-21T15:30:00',
-      status: 'Upcoming'
-    }
-  ]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterBy, setFilterBy] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -50,10 +47,6 @@ const DashboardScreen = () => {
     { text: 'Chats', icon: <ChatIcon />, path: '/chats' },
     { text: 'Calendar', icon: <CalendarMonthIcon />, path: '/calendar' }
   ];
-
-  const handleSessionClick = (sessionId) => {
-    navigate(`/sessions`);
-  };
 
   const handleMenuClick = (path) => {
     navigate(path);
@@ -106,52 +99,145 @@ const DashboardScreen = () => {
         sx={{
           flexGrow: 1,
           marginTop: '64px',
-          p: 3
+          p: 3,
+          maxWidth: '100vw'
         }}
       >
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Dashboard
+        {/* Search and Filters */}
+        <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
+          <TextField
+            placeholder="Search courses..."
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ flexGrow: 1 }}
+            InputProps={{
+              startAdornment: <SearchIcon sx={{ mr: 1 }} />
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Filter By</InputLabel>
+            <Select
+              value={filterBy}
+              label="Filter By"
+              onChange={(e) => setFilterBy(e.target.value)}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="completed">Completed</MenuItem>
+              <MenuItem value="upcoming">Upcoming</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={sortBy}
+              label="Sort By"
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <MenuItem value="date">Date</MenuItem>
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="progress">Progress</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        {/* Live Courses */}
+        <Typography variant="h5" sx={{ mb: 3 }}>
+          Live Courses
         </Typography>
         
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-          Welcome, John Doe!
-        </Typography>
+        <Card sx={{ mb: 4 }}>
+          <CardContent>
+            <Typography variant="h6">
+              Launching & Leading Startups: MVP to Market
+            </Typography>
+            <LinearProgress variant="determinate" value={60} sx={{ my: 2 }} />
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Progress: 60% Complete
+            </Typography>
+            
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>Course Outline:</Typography>
+            <List>
+              {['Idea Validation', 'MVP Development', 'Market Fit Strategies', 'Traction'].map((topic) => (
+                <ListItem key={topic}>
+                  <ListItemText primary={topic} />
+                </ListItem>
+              ))}
+            </List>
 
-        <Typography variant="h5" sx={{ mb: 2 }}>
-          Upcoming Sessions
-        </Typography>
+            <Divider sx={{ my: 2 }} />
 
-        <Stack spacing={2} sx={{ width: '100%' }}>
-          {upcomingSessions.map((session) => (
-            <Card key={session.id}>
-              <CardActionArea onClick={() => handleSessionClick(session.id)}>
-                <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="h6" component="div">
-                      {session.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {session.subject}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {new Date(session.dateTime).toLocaleString()}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Chip 
-                      label={session.status}
-                      color={session.status === 'Pre-reads Ready' ? 'primary' : 'default'}
-                      size="small"
-                    />
-                    <IconButton edge="end" aria-label="details">
-                      <ChevronRightIcon />
-                    </IconButton>
-                  </Box>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>Past Sessions:</Typography>
+            <Stack spacing={2}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="subtitle2">Startup Idea Validation</Typography>
+                  <Chip label="Recorded" size="small" color="secondary" />
                 </CardContent>
-              </CardActionArea>
+              </Card>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="subtitle2">Building an MVP</Typography>
+                  <Chip label="Recorded" size="small" color="secondary" />
+                </CardContent>
+              </Card>
+            </Stack>
+
+            <Typography variant="subtitle1" sx={{ mt: 3, mb: 2 }}>Upcoming Session:</Typography>
+            <Card 
+              variant="outlined" 
+              onClick={() => navigate('/sessions')} 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                  boxShadow: 2
+                }
+              }}
+            >
+              <CardContent>
+                <Typography variant="subtitle2">Traction</Typography>
+                <Typography variant="body2" color="text.secondary">March 12, 2025</Typography>
+                <Chip label="Scheduled" size="small" color="primary" sx={{ mt: 1 }} />
+              </CardContent>
             </Card>
+          </CardContent>
+        </Card>
+
+        {/* Previous Courses */}
+        <Typography variant="h5" sx={{ mb: 3 }}>
+          Previous Courses
+        </Typography>
+        <Grid container spacing={2} sx={{ mb: 4 }}>
+          {['Crafting Marketing Strategies', 'Business Analytics', 'Entrepreneurial Finance'].map((course) => (
+            <Grid item xs={12} md={4} key={course}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{course}</Typography>
+                  <Chip label="Completed" size="small" color="success" sx={{ mt: 1 }} />
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </Stack>
+        </Grid>
+
+        {/* Upcoming Courses */}
+        <Typography variant="h5" sx={{ mb: 3 }}>
+          Upcoming Courses
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6">Digital Marketing</Typography>
+                <Chip label="Coming Soon" size="small" color="warning" sx={{ mt: 1 }} />
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

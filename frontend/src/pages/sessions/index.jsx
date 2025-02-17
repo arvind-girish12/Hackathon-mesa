@@ -15,35 +15,41 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Rating,
+  TextField
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import UploadIcon from '@mui/icons-material/Upload';
+import PersonIcon from '@mui/icons-material/Person';
 
 const SessionScreen = () => {
   const navigate = useNavigate();
-  // Mock data - would come from API in real app
   const [sessionData] = useState({
-    title: 'Introduction to Calculus',
-    summary: 'This session covers the fundamental concepts of calculus including limits, derivatives, and basic integration. We\'ll focus on building intuition for these concepts through practical examples.',
+    title: 'Traction',
+    instructor: 'Ray Titus',
+    summary: 'Focuses on strategies to achieve early traction and customer acquisition.',
     keyQuestions: [
-      'What is the relationship between derivatives and rates of change?',
-      'How do we interpret the geometric meaning of derivatives?',
-      'What are the basic rules of differentiation?'
+      'What are key traction channels for startups?',
+      'How to measure traction effectively?',
+      'Which channels work best for B2B vs B2C?'
     ],
     insights: [
-      'Students often struggle with visualizing derivatives geometrically',
-      'Understanding limits is crucial for grasping derivatives',
-      'Practice with real-world applications helps cement understanding'
+      'Importance of setting KPIs for traction',
+      'Leveraging marketing channels for growth',
+      'Focus on one channel at a time initially'
     ],
     preparationMaterials: [
-      'Chapter 1-2 from Stewart Calculus',
-      'Pre-recorded video on limits',
-      'Practice problems set'
-    ]
+      'Reading: "Bullseye Framework for Traction" (PDF)',
+      'Case Study: "AirBnB Growth Strategy"',
+      'Pre-session worksheet'
+    ],
+    notes: '',
+    rating: 0,
+    feedback: ''
   });
 
   const menuItems = [
@@ -65,10 +71,10 @@ const SessionScreen = () => {
     <Box sx={{ display: 'flex' }}>
       <AppBar position="fixed">
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" align="left">
             Mind Palace
           </Typography>
-          <Typography variant="subtitle1" sx={{ ml: 2 }}>
+          <Typography variant="subtitle1" sx={{ ml: 2 }} align="left">
             Your Personal Learning Companion
           </Typography>
         </Toolbar>
@@ -109,9 +115,17 @@ const SessionScreen = () => {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4">
-            {sessionData.title}
-          </Typography>
+          <Box>
+            <Typography variant="h4" align="left">
+              {sessionData.title}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <PersonIcon sx={{ mr: 1 }} />
+              <Typography variant="subtitle1" align="left">
+                Instructor: {sessionData.instructor} (Live session with Q&A)
+              </Typography>
+            </Box>
+          </Box>
           <Button
             variant="contained"
             startIcon={<UploadIcon />}
@@ -124,10 +138,10 @@ const SessionScreen = () => {
         <Stack spacing={3}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom align="left">
                 Session Summary
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" align="left">
                 {sessionData.summary}
               </Typography>
             </CardContent>
@@ -135,12 +149,12 @@ const SessionScreen = () => {
 
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom align="left">
                 Key Questions
               </Typography>
               <Stack spacing={1}>
                 {sessionData.keyQuestions.map((question, index) => (
-                  <Typography key={index} variant="body1">
+                  <Typography key={index} variant="body1" align="left">
                     • {question}
                   </Typography>
                 ))}
@@ -150,12 +164,12 @@ const SessionScreen = () => {
 
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom align="left">
                 Insights & Learning Focus
               </Typography>
               <Stack spacing={1}>
                 {sessionData.insights.map((insight, index) => (
-                  <Typography key={index} variant="body1">
+                  <Typography key={index} variant="body1" align="left">
                     • {insight}
                   </Typography>
                 ))}
@@ -165,16 +179,52 @@ const SessionScreen = () => {
 
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom align="left">
                 Preparation Materials
               </Typography>
               <Stack spacing={1}>
                 {sessionData.preparationMaterials.map((material, index) => (
-                  <Typography key={index} variant="body1">
+                  <Typography key={index} variant="body1" align="left">
                     • {material}
                   </Typography>
                 ))}
               </Stack>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom align="left">
+                Session Notes
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                placeholder="Take notes during the session..."
+                variant="outlined"
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom align="left">
+                Session Feedback
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle1" gutterBottom align="left">
+                  Rate this session:
+                </Typography>
+                <Rating size="large" />
+              </Box>
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                placeholder="Share your thoughts about the session..."
+                variant="outlined"
+              />
             </CardContent>
           </Card>
 
