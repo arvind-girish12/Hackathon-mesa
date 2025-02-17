@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Container,
   TextField,
   Button,
   List,
@@ -16,6 +15,8 @@ import {
   Stack,
   Paper,
 } from "@mui/material";
+import ReactMarkdown from "react-markdown";
+import { format } from "date-fns";
 import ChatIcon from "@mui/icons-material/Chat";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
@@ -41,7 +42,6 @@ const ChatScreen = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    // Add user message
     const userMessage = {
       text: inputMessage,
       sender: "user",
@@ -54,15 +54,12 @@ const ChatScreen = () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/api/ask", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: inputMessage }),
       });
 
       const data = await response.json();
 
-      // Add bot response
       const botMessage = {
         text: data.answer || "I'm sorry, I didn't understand that.",
         sender: "bot",
@@ -77,14 +74,16 @@ const ChatScreen = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
+      {/* AppBar */}
       <AppBar position="fixed">
         <Toolbar>
-          <Typography variant="h6" noWrap component="div" align="left">
+          <Typography variant="h6" noWrap component="div">
             Chat with Jarvis
           </Typography>
         </Toolbar>
       </AppBar>
 
+      {/* Drawer */}
       <Drawer
         variant="permanent"
         sx={{
@@ -111,6 +110,7 @@ const ChatScreen = () => {
         </List>
       </Drawer>
 
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
@@ -123,13 +123,8 @@ const ChatScreen = () => {
           pb: 10,
         }}
       >
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: "auto",
-            mb: 2,
-          }}
-        >
+        {/* Message Display */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", mb: 2 }}>
           <Stack spacing={2}>
             {messages.map((message, index) => (
               <Box
@@ -145,12 +140,29 @@ const ChatScreen = () => {
                     p: 2,
                     maxWidth: "70%",
                     backgroundColor:
-                      message.sender === "user" ? "primary.main" : "grey.100",
-                    color: message.sender === "user" ? "white" : "text.primary",
+                      message.sender === "user" ? "#1976d2" : "#f5f5f5",
+                    color: message.sender === "user" ? "#fff" : "#000",
+                    borderRadius:
+                      message.sender === "user"
+                        ? "15px 15px 0px 15px"
+                        : "15px 15px 15px 0px",
                   }}
                 >
-                  <Typography variant="body1" align="left">
-                    {message.text}
+                  {/* Left-align text */}
+                  <Typography
+                    variant="body1"
+                    sx={{ textAlign: "left" }} // Ensures left alignment
+                  >
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                  </Typography>
+
+                  {/* Timestamp */}
+                  <Typography
+                    variant="caption"
+                    align="right"
+                    sx={{ display: "block", mt: 1 }}
+                  >
+                    {format(new Date(message.timestamp), "PPpp")}
                   </Typography>
                 </Paper>
               </Box>
@@ -158,6 +170,7 @@ const ChatScreen = () => {
           </Stack>
         </Box>
 
+        {/* Input Box */}
         <Box
           sx={{
             display: "flex",
@@ -167,7 +180,7 @@ const ChatScreen = () => {
             left: 240,
             right: 0,
             p: 3,
-            backgroundColor: "background.default",
+            backgroundColor: "#fff",
           }}
         >
           <TextField
